@@ -1,0 +1,25 @@
+/*
+Group 6
+Damaion Freeman
+Greg Bradner
+Karan Patel
+Zackary Pulaski
+*/
+-- Question 1
+SELECT Customer.CID, Customer.firstname, Customer.lastname, COUNT(ActiveOrder.CID), COUNT(OrderHistory.CID)
+FROM Customer, ActiveOrder,  OrderHistory
+WHERE city = 'Greenville' AND state = 'NC' AND Customer.CID = ActiveOrder.CID AND Customer.CID = OrderHistory.CID;
+
+-- Our Group Question
+-- For each customer list there name(first and last), and number of active orders and the dollar amount spent.
+
+SELECT firstname, lastname, count(CID), sum(dollar-amount)
+FROM Customer NATURAL JOIN ActiveOrder
+GROUP BY firstname, lastname;
+
+-- Group 5 Question
+-- Count the number of customers from Greenville, NC that have ordered 'Product A'.
+
+SELECT count(CID)
+FROM ActiveOrder, OrderDetails, Product, Customer
+WHERE ActiveOrder.OrderNo = OrderDetails.OrderNo AND OrderDetails.PID = Product.PID AND Product.PName = 'Product A' AND city = 'Greenville' AND state = 'NC';
