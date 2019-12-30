@@ -1,0 +1,183 @@
+drop table History;
+drop table CurrentLoan;
+drop table Member;
+drop table Book;
+drop view member_book;
+
+create table Book
+	 (bookID		int,
+ 	  ISBN		int,
+ 	  title		char(25),
+ 	  author 		char(45),
+ 	  publish_year 	DATE,
+ 	  category 	char(20),
+ 	  primary key (bookID));
+create table Member
+	 (MemberID		int,
+ 	  lastname 	char(50),
+ 	  firstname 	char(50),
+ 	  address 		char(50),
+ 	  phone_number 	varchar(13),
+ 	  limit 		int,
+ 	  primary key(MemberID));
+create table CurrentLoan
+	 (memberID		int,
+ 	  bookID 		int,
+ 	  loan_date 	DATE,
+ 	  due_date 	DATE,
+ 	  primary key(memberID, bookID),
+	  foreign key(memberID) references Member(memberID),
+	  foreign key(bookID) references Book(bookID));
+create table History
+	 (memberID		int,
+	  bookID 		int,
+ 	  loan_date 	DATE,
+ 	  return_date 	DATE,
+ 	  primary key(memberID, bookID, loan_date),
+	  foreign key(memberID) references Member(memberID),
+	  foreign key(bookID) references Book(bookID));
+
+
+insert into Book values
+('257', '12345678', 'Legend', 'Mike Sampson', 
+ '20-jul-2004', 'Fiction');
+commit;
+
+insert into Book values
+('377', '12345678', 'Legend', 'Mike Sampson', 
+ '20-jul-2004', 'Fiction');
+commit;
+
+insert into Book values
+('254', '12345678', 'Legend', 'Mike Sampson', 
+ '20-jul-2004', 'Fiction');
+commit;
+
+
+insert into Book values
+('355', '287446', 'XMLXQuery', 'James Mcquire', 
+ '14-feb-2010', 'Reference');
+commit;
+
+insert into Book values
+('144', '947832', 'XQuery or XML', 'Michael Johnson', 
+ '03-dec-1992', 'Reference');
+commit;
+
+insert into Book values
+('055', '0243522', 'Coding Simplicity', 'Steve Smith', 
+ '02-mar-1998', 'Reference');
+commit;
+
+insert into Book values
+('032', '4288739', 'Trapped Away', 'Mike Simpson', 
+ '27-jan-1999', 'Non-Fiction');
+commit;
+
+insert into Book values
+('001', '1111442', 'XQuery, sqlplus, and XML', 
+ 'George Benson', '10-nov-2000', 'Reference');
+commit;
+
+insert into Book values
+('023', '2145879', 'Zoo', 'Henry Zeplin', 
+ '14-jan-2008', 'Childrens');
+commit;
+
+insert into Book values
+('100', '14523378', 'Life as A Comp Sci Major', 
+ 'Steven Mulch', '21-sep-2016', 'Reference');
+commit;
+
+insert into Book values
+('156', '45788965', 'Problem Solving', 'Felix Moore', 
+ '08-jul-1978', 'Reference');
+commit;
+
+insert into Book values
+('222', '13589746', 'Unity', 'Arno Dorian', 
+ '12-oct-2015', 'Fiction');
+commit;
+
+insert into Member values('001', 'Freeman', 'Damaion', '145 Pine Drive', '2524144789', '8');
+commit;
+
+insert into Member values('002', 'Smith', 'John', '478 Real Road', '2528779562', '2');
+commit;
+
+insert into Member values('003', 'Link', 'Zelda', '120 Hyrule Castle', '4145789955', '9');
+commit;
+
+insert into Member values('004', 'James', 'Tyler', '410 Brick Highway', '2144789562', '5');
+commit;
+
+insert into Member values('005', 'Jones', 'David', '874 London Street', '5195086547', '4');
+commit;
+
+insert into CurrentLoan values('002', '222', '21-feb-2015', '12-mar-2015');
+commit;
+
+insert into CurrentLoan values('005', '156', '23-feb-2015', '14-mar-2015');
+commit;
+
+insert into CurrentLoan values('001', '222', '23-feb-2015', '14-mar-2015');
+commit;
+
+insert into History values('002', '156', '11-sep-2012', '21-sep-2012');
+commit;
+
+insert into History values('005', '023', '02-jan-2015', '23-jan-2015');
+commit;
+
+
+PROMPT Answer For Question 1;
+SELECT Member.memberID, Member.lastname, Member.firstname, count(CurrentLoan.bookID)
+FROM Member, CurrentLoan
+WHERE Member.memberID = CurrentLoan.memberID
+GROUP BY(Member.memberID, Member.lastname, Member.firstname);
+
+PROMPT Answer For Question 2;
+SELECT ISBN, title
+FROM Book
+GROUP BY(ISBN, title)
+HAVING count(ISBN) >= 2;
+
+PROMPT Answer For Question 3;
+CREATE VIEW member_book AS 
+(SELECT m.memberID, m.lastname, m.firstname, c.bookID, b.title 
+FROM Member m, CurrentLoan c, Book b 
+WHERE b.bookID = c.bookID AND m.memberID = c.memberID) 
+UNION 
+(SELECT m.memberID, m.lastname, m.firstname, h.bookID, b.title 
+FROM Member m, History h, Book b 
+WHERE b.bookID = h.bookID AND m.memberID = h.memberID);
+
+PROMPT Answer For Question 4;
+SELECT mb.bookID, mb.title 
+FROM member_book mb 
+WHERE mb.firstname = 'John' AND mb.lastname = 'Smith';
+
+PROMPT Answer For Question 5;
+DELETE FROM History
+WHERE memberID in
+(SELECT memberID
+FROM Member
+WHERE firstname = 'David' AND lastname = 'Jones');
+
+DELETE FROM CurrentLoan
+WHERE memberID in 
+(SELECT memberID
+FROM Member
+WHERE firstname = 'David' AND lastname = 'Jones');
+
+DELETE FROM Member
+WHERE firstname = 'David' AND lastname = 'Jones';
+
+PROMPT Answer For Question 6;
+SELECT memberID, limit
+FROM Member;
+UPDATE Member
+SET limit = limit + 2
+WHERE limit <= 8;
+SELECT memberID, limit
+FROM Member;
